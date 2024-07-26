@@ -1,0 +1,36 @@
+name: schedule_pgvector_pull
+
+on:
+  schedule:
+    # 12:34AM every Tuesday
+    - cron:  '34 12 * * TUE'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: pgvector-builds
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: pgvector/pgvector
+          path: pgvector
+
+      - name: Trigger other workflows by `push`ing a new `commit` on new release
+        shell: bash
+        run: |
+          msg="$(GIT_DIR=pgvector/.git git log -1 --pretty='format:%h\t%B')"
+          cd pgvector
+          if ! grep -qF "$version" 'RELEASE'; then
+            version="$(curl -s https://api.github.com/repos/pgvector/pgvector/releases/latest | jq -r .tag_name)"
+            sed -i '/^ARG PG_VECTOR=/c\ARG PG_VECTOR='"$version" Dockerfile.alpine
+            if ! git diff --exit-code Dockerfile.alpine >/dev/null; then
+              printf '%s\n' "$msg" >> 'RELEASE'
+              git commit -am "$msg"
+              git push origin master
+            fi
+          fi
