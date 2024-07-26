@@ -18,9 +18,9 @@ jobs:
         run: |
           version="$(curl -s https://api.github.com/repos/pgvector/pgvector/releases/latest | jq -r .tag_name)"
           # rather than pass in next `step` with `build-args` replace here:
-          sed -i '/^ARG pgvector_version=/c\ARG pgvector_version='"$version" Dockerfile.distroless
+          sed -i '/^ARG pgvector_version=/c\ARG pgvector_version='"$version" Dockerfile.alpine
           # Don't run next `step` if Dockerfile unchanged
-          # git diff --exit-code Dockerfile.distroless >/dev/null && >&2 echo 'No Dockerfile changes made' && exit 3
+          # git diff --exit-code Dockerfile.alpine >/dev/null && >&2 echo 'No Dockerfile changes made' && exit 3
           printf 'pgvector_version=%s\n' "$version" >> "$GITHUB_OUTPUT"
           printf '%s\n' "$version" > VERSION
           echo "::set-output name=pgvector_version::$version"
@@ -50,7 +50,7 @@ jobs:
         with:
           context: .
           push: true
-          file: Dockerfile.distroless
+          file: Dockerfile.alpine
           tags: |
             samuelmarks/pgvector-builds:alpine_latest
             samuelmarks/pgvector-builds:alpine_${{ steps.pgvector_version.outputs.pgvector_version }}
