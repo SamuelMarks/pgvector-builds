@@ -27,8 +27,8 @@ jobs:
           cd pgvector
           if ! grep -qF "$version" 'RELEASE'; then
             version="$(curl -s https://api.github.com/repos/pgvector/pgvector/releases/latest | jq -r .tag_name)"
-            sed -i '/^ARG PG_VECTOR=/c\ARG PG_VECTOR='"$version" Dockerfile.alpine
-            if ! git diff --exit-code Dockerfile.alpine >/dev/null; then
+            sed -i '/^ARG PG_VECTOR=/c\ARG PG_VECTOR='"$version" alpine.Dockerfile
+            if ! git diff --exit-code alpine.Dockerfile >/dev/null; then
               printf '%s\n' "$msg" >> 'RELEASE'
               git commit -am "$msg"
               git push origin master

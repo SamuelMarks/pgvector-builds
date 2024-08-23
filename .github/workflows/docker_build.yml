@@ -18,9 +18,9 @@ jobs:
         run: |
           version="$(curl -s https://api.github.com/repos/pgvector/pgvector/tags | jq -r .[0].name)"
           # rather than pass in next `step` with `build-args` replace here:
-          sed -i '/^ARG pgvector_version=/c\ARG pgvector_version='"$version" Dockerfile.alpine
+          sed -i '/^ARG pgvector_version=/c\ARG pgvector_version='"$version" alpine.Dockerfile
           # Don't run next `step` if Dockerfile unchanged
-          # git diff --exit-code Dockerfile.alpine >/dev/null && >&2 echo 'No Dockerfile changes made' && exit 3
+          # git diff --exit-code alpine.Dockerfile >/dev/null && >&2 echo 'No Dockerfile changes made' && exit 3
           printf 'pgvector_version=%s\n' "$version" >> "$GITHUB_OUTPUT"
           printf '%s\n' "$version" > VERSION
           echo "::set-output name=pgvector_version::$version"
@@ -30,7 +30,7 @@ jobs:
         with:
           filters: |
             Dockerfile:
-              - 'Dockerfile*'
+              - '*Dockerfile'
 
 #    if: needs.prepare.outputs.Dockerfile == 'true'
       - name: Set up QEMU
@@ -50,7 +50,7 @@ jobs:
         with:
           context: .
           push: true
-          file: Dockerfile.alpine
+          file: alpine.Dockerfile
           tags: |
             samuelmarks/pgvector-builds:alpine_latest
             samuelmarks/pgvector-builds:alpine_${{ steps.pgvector_version.outputs.pgvector_version }}
