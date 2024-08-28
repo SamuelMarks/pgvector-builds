@@ -54,5 +54,3 @@ jobs:
           tags: |
             samuelmarks/pgvector-builds:alpine_latest
             samuelmarks/pgvector-builds:alpine_${{ steps.pgvector_version.outputs.pgvector_version }}
-        env:
-          pgvector_version: ${{ steps.pgvector_version.outputs.pgvector_version }}
