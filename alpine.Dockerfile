@@ -1,5 +1,5 @@
-ARG PG_MAJOR=16
-ARG PG_VECTOR="0.7.4"
+ARG PG_MAJOR=17
+ARG PG_VECTOR="0.8.0"
 
 FROM postgres:${PG_MAJOR}-alpine AS builder
 ARG PG_MAJOR
@@ -8,14 +8,14 @@ ARG PG_VECTOR
 WORKDIR /tmp/pgvector
 ADD "https://github.com/pgvector/pgvector/archive/refs/tags/v${PG_VECTOR}.tar.gz" .
 RUN tar xf "v${PG_VECTOR}.tar.gz" && \
-    apk add --no-cache build-base clang15 llvm15 postgresql${PG_MAJOR}-dev && \
+    apk add --no-cache build-base clang19 llvm19 postgresql${PG_MAJOR}-dev && \
     cd /tmp/pgvector/pgvector-${PG_VECTOR} && \
 	make clean && \
 	make OPTFLAGS="" && \
 	make install && \
 	mkdir -p /usr/share/doc/pgvector && \
 	cp LICENSE README.md /usr/share/doc/pgvector && \
-	apk del --no-cache build-base clang15 llvm15 postgresql${PG_MAJOR}-dev && \
+	apk del --no-cache build-base clang19 llvm19 postgresql${PG_MAJOR}-dev && \
 	rm -r /tmp/pgvector
 
 FROM postgres:${PG_MAJOR}-alpine AS runner
